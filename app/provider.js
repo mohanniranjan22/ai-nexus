@@ -17,6 +17,7 @@ function Provider({ children, ...props }) {
   const { user } = useUser();
   const [aiSelectedModels, setAiSelectedModels] = useState(DefaultModel);
   const [userDetails, setUserDetails] = useState();
+  const [messages, setMessages] = useState({});
 
   useEffect(() => {
     if (user) {
@@ -32,7 +33,7 @@ function Provider({ children, ...props }) {
       console.log("Existing User");
       const userInfo = userSnap.data();
       setAiSelectedModels(userInfo?.selectedModelPref);
-      setUserDetails(userInfo)
+      setUserDetails(userInfo);
       return;
     } else {
       const userData = {
@@ -45,7 +46,7 @@ function Provider({ children, ...props }) {
       };
       await setDoc(userRef, userData);
       console.log(" New user data saved");
-      setUserDetails(userData)
+      setUserDetails(userData);
     }
 
     //if not then insert
@@ -60,7 +61,12 @@ function Provider({ children, ...props }) {
     >
       <UserDetailsContext.Provider value={{ userDetails, setUserDetails }}>
         <AiSelectedModelContext.Provider
-          value={{ aiSelectedModels, setAiSelectedModels }}
+          value={{
+            aiSelectedModels,
+            setAiSelectedModels,
+            messages,
+            setMessages,
+          }}
         >
           <SidebarProvider>
             <AppSidebar />
