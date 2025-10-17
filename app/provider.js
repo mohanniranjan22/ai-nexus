@@ -7,7 +7,7 @@ import { AppSidebar } from "./_components/AppSidebar";
 import AppHeader from "./_components/AppHeader";
 import { useUser } from "@clerk/nextjs";
 import { db } from "@/config/FirebaseConfig";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { DefaultModel } from "@/shared/AiModelsShared";
 import { UserDetailsContext } from "@/context/UserDetailsContext";
@@ -17,12 +17,38 @@ function Provider({ children, ...props }) {
   const { user } = useUser();
   const [aiSelectedModels, setAiSelectedModels] = useState(DefaultModel);
   const [userDetails, setUserDetails] = useState();
+  const [messages, setMessages] = useState({});
 
   useEffect(() => {
     if (user) {
       CreateUser();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (aiSelectedModels) {
+      //update to Firebase Database
+      updateAIModelSelectionPref();
+    }
+  }, [aiSelectedModels]);
+
+  // const updateAIModelSelectionPref = async () => {
+  //   const docRef = doc(db, "users", user?.primaryEmailAddress?.emailAddress);
+  //   await updateDoc(docRef, {
+  //     selectedModelPref: aiSelectedModels,
+  //   });
+  // };
+  const updateAIModelSelectionPref = async () => {
+    if (!user?.primaryEmailAddress?.emailAddress) {
+      console.warn("User email not available — skipping Firestore update.");
+      return;
+    }
+
+    const docRef = doc(db, "users", user?.primaryEmailAddress?.emailAddress);
+    await updateDoc(docRef, {
+      selectedModelPref: aiSelectedModels,
+    });
+  };
 
   const CreateUser = async () => {
     //if User exist?
@@ -31,8 +57,8 @@ function Provider({ children, ...props }) {
     if (userSnap.exists()) {
       console.log("Existing User");
       const userInfo = userSnap.data();
-      setAiSelectedModels(userInfo?.selectedModelPref);
-      setUserDetails(userInfo)
+      setAiSelectedModels(userInfo?.selectedModelPref?.DefaultModel);
+      setUserDetails(userInfo);
       return;
     } else {
       const userData = {
@@ -45,7 +71,7 @@ function Provider({ children, ...props }) {
       };
       await setDoc(userRef, userData);
       console.log(" New user data saved");
-      setUserDetails(userData)
+      setUserDetails(userData);
     }
 
     //if not then insert
@@ -60,7 +86,12 @@ function Provider({ children, ...props }) {
     >
       <UserDetailsContext.Provider value={{ userDetails, setUserDetails }}>
         <AiSelectedModelContext.Provider
-          value={{ aiSelectedModels, setAiSelectedModels }}
+          value={{
+            aiSelectedModels,
+            setAiSelectedModels,
+            messages,
+            setMessages,
+          }}
         >
           <SidebarProvider>
             <AppSidebar />
