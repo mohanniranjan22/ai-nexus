@@ -12,36 +12,45 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Lock, MessageSquare } from "lucide-react";
+import { Loader, Loader2, Lock, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/FirebaseConfig";
 import { useUser } from "@clerk/nextjs";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 function AiMultiModels() {
-  const {user}=useUser()
+  const { user } = useUser();
   const [aiModelList, setAimodelList] = useState(AiModelList);
-  const { aiSelectedModels, setAiSelectedModels } = useContext(
-    AiSelectedModelContext
-  );
+  const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
+    useContext(AiSelectedModelContext);
   const onToggleChange = (model, value) => {
     setAimodelList((prev) =>
       prev.map((m) => (m.model == model ? { ...m, enable: value } : m))
     );
+    setAiSelectedModels((prev) => ({
+      ...prev,
+      [model]: {
+        ...(prev?.[model] ?? {}),
+        enable: value,
+      },
+    }));
   };
+  console.log(aiSelectedModels);
 
-  const onSelectedValue = async(parentModel, value) => {
+  const onSelectedValue = async (parentModel, value) => {
     setAiSelectedModels((prev) => ({
       ...prev,
       [parentModel]: { modelId: value },
     }));
 
     //update to FireBase database
-    const docRef=doc(db,"users",user?.primaryEmailAddress?.emailAddress)
-    await updateDoc(docRef,{
-      selectedModelPref:aiSelectedModels 
-    })
+    const docRef = doc(db, "users", user?.primaryEmailAddress?.emailAddress);
+    await updateDoc(docRef, {
+      selectedModelPref: aiSelectedModels,
+    });
   };
 
   return (
@@ -66,13 +75,21 @@ function AiMultiModels() {
               />
               {model.enable && (
                 <Select
+<<<<<<< HEAD
                   defaultValue={aiSelectedModels?.[model.model]?.modelId}
+=======
+                  defaultValue={aiSelectedModels[model.model]?.modelId}
+>>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
                   onValueChange={(value) => onSelectedValue(model.model, value)}
                   disabled={model.premium}
                 >
                   <SelectTrigger className="w-[180px]">
                     <SelectValue
+<<<<<<< HEAD
                       placeholder={aiSelectedModels?.[model.model]?.modelId}
+=======
+                      placeholder={aiSelectedModels[model.model]?.modelId}
+>>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
                     />
                   </SelectTrigger>
                   <SelectContent>
@@ -123,10 +140,44 @@ function AiMultiModels() {
           {model.premium && model.enable && (
             <div className="flex items-center justify-center h-full">
               <Button>
-                {" "}
                 <Lock />
                 Upgrade to unlock
               </Button>
+            </div>
+          )}
+          {model.enable && (
+            <div className="flex-1 p-4">
+              <div className="flex-1 p-4 space-y-2">
+                {messages[model.model]?.map((m, i) => (
+                  <div
+                    key={i}
+                    className={`p-2 rounded-md ${
+                      m.role == "user"
+                        ? "bg-blue-100 text-blue-900"
+                        : "bg-gray-100 text-gray-900"
+                    }`}
+                  >
+                    {m.role == "assistant" && (
+                      <span className="text-sm text-gray-400">
+                        {m.model ?? model.model}
+                      </span>
+                    )}
+                    <div className="flex gap-3 items-center">
+                      {m.content == "loading" && (
+                        <>
+                          <Loader className="h-5 w-5 animate-spin text-gray-500" />
+                          <span>Thinking...</span>
+                        </>
+                      )}
+                      {m.content !== "loading" && (
+                        <Markdown remarkPlugins={[remarkGfm]}>
+                          {m.content}
+                        </Markdown>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

@@ -5,12 +5,21 @@ import React, { useContext, useEffect, useState } from "react";
 import AiMultiModels from "./AiMultiModels";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import axios from "axios";
+<<<<<<< HEAD
 
 function ChatInputBox() {
   const [userInput, setUserInput] = useState();
   const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
     useContext(AiSelectedModelContext);
 
+=======
+
+
+function ChatInputBox() {
+  const [userInput, setUserInput] = useState("");
+  const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
+    useContext(AiSelectedModelContext);
+>>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
   const handleSend = async () => {
     if (!userInput.trim()) return;
 
@@ -18,10 +27,19 @@ function ChatInputBox() {
     setMessages((prev) => {
       const updated = { ...prev };
       Object.keys(aiSelectedModels).forEach((modelKey) => {
+<<<<<<< HEAD
         updated[modelKey] = [
           ...(updated[modelKey] ?? []),
           { role: "user", content: userInput },
         ];
+=======
+        if (aiSelectedModels[modelKey].enable) {
+          updated[modelKey] = [
+            ...(updated[modelKey] ?? []),
+            { role: "user", content: userInput },
+          ];
+        }
+>>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
       });
       return updated;
     });
@@ -32,7 +50,12 @@ function ChatInputBox() {
     // 2️⃣ Fetch response from each enabled model
     Object.entries(aiSelectedModels).forEach(
       async ([parentModel, modelInfo]) => {
+<<<<<<< HEAD
         if (!modelInfo.modelId) return;
+=======
+        if (!modelInfo.modelId || aiSelectedModels[parentModel].enable == false)
+          return;
+>>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
 
         // Add loading placeholder before API call
         setMessages((prev) => ({
@@ -95,11 +118,17 @@ function ChatInputBox() {
     );
   };
 
+<<<<<<< HEAD
 
   useEffect(()=>{
    console.log("messages in chat box: ",messages)
 
   },[messages])
+=======
+  useEffect(() => {
+    console.log(messages);
+  }, [messages]);
+>>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
 
   return (
     <div className="relative min-h-screen">
@@ -113,7 +142,12 @@ function ChatInputBox() {
           <input
             type="text"
             placeholder="Ask me anything....."
+<<<<<<< HEAD
             className="border-0 outline-none"
+=======
+            className="border-0 outline-none w-full"
+            value={userInput}
+>>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
             onChange={(event) => setUserInput(event.target.value)}
           />
           <div className="mt-3 flex justify-between items-center">
@@ -124,7 +158,15 @@ function ChatInputBox() {
               <Button variant={"ghost"} size={"icon"}>
                 <Mic />
               </Button>
+<<<<<<< HEAD
               <Button size={"icon"} className={"bg-blue-500"} onClick={handleSend}>
+=======
+              <Button
+                size={"icon"}
+                className={"bg-blue-500"}
+                onClick={handleSend}
+              >
+>>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
                 <Send />
               </Button>
             </div>

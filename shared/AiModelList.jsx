@@ -58,7 +58,7 @@ export default [
   {
     model: "Cohere",
     icon: "/cohere.png",
-    premium: false,
+    premium: true,
     enable: true,
     subModel: [
       { name: "Cohere Command A", premium: false, id: "cohere-command-a" },

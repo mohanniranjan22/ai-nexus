@@ -7,7 +7,7 @@ import { AppSidebar } from "./_components/AppSidebar";
 import AppHeader from "./_components/AppHeader";
 import { useUser } from "@clerk/nextjs";
 import { db } from "@/config/FirebaseConfig";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 import { DefaultModel } from "@/shared/AiModelsShared";
 import { UserDetailsContext } from "@/context/UserDetailsContext";
@@ -25,6 +25,31 @@ function Provider({ children, ...props }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (aiSelectedModels) {
+      //update to Firebase Database
+      updateAIModelSelectionPref();
+    }
+  }, [aiSelectedModels]);
+
+  // const updateAIModelSelectionPref = async () => {
+  //   const docRef = doc(db, "users", user?.primaryEmailAddress?.emailAddress);
+  //   await updateDoc(docRef, {
+  //     selectedModelPref: aiSelectedModels,
+  //   });
+  // };
+  const updateAIModelSelectionPref = async () => {
+    if (!user?.primaryEmailAddress?.emailAddress) {
+      console.warn("User email not available — skipping Firestore update.");
+      return;
+    }
+
+    const docRef = doc(db, "users", user?.primaryEmailAddress?.emailAddress);
+    await updateDoc(docRef, {
+      selectedModelPref: aiSelectedModels,
+    });
+  };
+
   const CreateUser = async () => {
     //if User exist?
     const userRef = doc(db, "users", user?.primaryEmailAddress?.emailAddress);
@@ -32,7 +57,7 @@ function Provider({ children, ...props }) {
     if (userSnap.exists()) {
       console.log("Existing User");
       const userInfo = userSnap.data();
-      setAiSelectedModels(userInfo?.selectedModelPref);
+      setAiSelectedModels(userInfo?.selectedModelPref?.DefaultModel);
       setUserDetails(userInfo);
       return;
     } else {
