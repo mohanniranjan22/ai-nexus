@@ -75,21 +75,13 @@ function AiMultiModels() {
               />
               {model.enable && (
                 <Select
-<<<<<<< HEAD
-                  defaultValue={aiSelectedModels?.[model.model]?.modelId}
-=======
                   defaultValue={aiSelectedModels[model.model]?.modelId}
->>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
                   onValueChange={(value) => onSelectedValue(model.model, value)}
                   disabled={model.premium}
                 >
                   <SelectTrigger className="w-[180px]">
                     <SelectValue
-<<<<<<< HEAD
-                      placeholder={aiSelectedModels?.[model.model]?.modelId}
-=======
                       placeholder={aiSelectedModels[model.model]?.modelId}
->>>>>>> f093a0527dc14c2e1555e5199de56f4d7c456b35
                     />
                   </SelectTrigger>
                   <SelectContent>
