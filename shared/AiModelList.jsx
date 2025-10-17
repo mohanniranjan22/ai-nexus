@@ -2,7 +2,7 @@ export default [
   {
     model: "GPT",
     icon: "/gpt.png",
-    premium: false,
+    premium: true,
     enable: true,
     subModel: [
       { name: "GPT 3.5", premium: false, id: "gpt-3.5" },
@@ -11,6 +11,7 @@ export default [
       { name: "GPT 4.1", premium: true, id: "gpt-4.1" },
       { name: "GPT 5 Nano", premium: false, id: "gpt-5-nano" },
       { name: "GPT 5 Mini", premium: false, id: "gpt-5-mini" },
+      { name: "GPT 5", premium: true, id: "gpt-5" },
     ],
   },
   {
@@ -27,7 +28,7 @@ export default [
   {
     model: "DeepSeek",
     icon: "/deepseek.png",
-    premium: false,
+    premium: true,
     enable: true,
     subModel: [
       { name: "DeepSeek R1", premium: false, id: "DeepSeek-R1" },
@@ -41,7 +42,7 @@ export default [
     enable: true,
     subModel: [
       { name: "Mistral Medium 2505", premium: true, id: "mistral-medium-2505" },
-      { name: "Mistral 3B", premium: false, id: "Mistral-3B" },
+      { name: "Ministral 3B", premium: false, id: "Ministral-3B" },
     ],
   },
   {
@@ -57,14 +58,14 @@ export default [
   {
     model: "Cohere",
     icon: "/cohere.png",
-    premium: true,
+    premium: false,
     enable: true,
     subModel: [
       { name: "Cohere Command A", premium: false, id: "cohere-command-a" },
       {
         name: "Cohere Command R 08-2024",
         premium: false,
-        id: "Cohere-command-08-2024",
+        id: "Cohere-command-r-08-2024",
       },
     ],
   },
