@@ -3,15 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import ChatInputBox from "./_components/ChatInputBox";
 
 export default function Home() {
   const { setTheme } = useTheme();
   return (
     <div>
-      <h1>this is ai nexus saas application</h1>
-      <Button>subcribe</Button>
-      <Button onClick={() => setTheme("dark")}>dark mode</Button>
-      <Button onClick={() => setTheme("light")}>light mode</Button>
+      <ChatInputBox />
     </div>
   );
 }
