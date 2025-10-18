@@ -8,7 +8,7 @@ import {
   SidebarGroup,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { SignInButton, useUser } from "@clerk/nextjs";
+import { SignInButton, useAuth, useUser } from "@clerk/nextjs";
 import { Moon, Sun, User2, Zap } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -20,15 +20,18 @@ import moment from "moment/moment";
 import Link from "next/link";
 import axios from "axios";
 import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
+import PricingModal from "./PricingModal";
 
 export function AppSidebar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { user } = useUser();
   const [chatHistory, setChatHistory] = useState([]);
-  const [freeMsgCount,setFreeMesgCount]=useState(0)
+  const [freeMsgCount, setFreeMesgCount] = useState(0);
   const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
-      useContext(AiSelectedModelContext);
+    useContext(AiSelectedModelContext);
+  const { has } = useAuth();
+  // const paidUser = has({ plan: "unlimited_plan" });
 
   useEffect(() => setMounted(true), []);
 
@@ -48,16 +51,13 @@ export function AppSidebar() {
       const chats = snapshot.docs.map((doc) => doc.data());
       setChatHistory(chats);
     });
-  
 
     return () => unsubscribe();
   }, [user]);
 
-
-  useEffect(()=>{
-    GetRemainingTokenMsgs()
-
-  },[messages])
+  useEffect(() => {
+    GetRemainingTokenMsgs();
+  }, [messages]);
 
   const GetLastUserMessageFromChatSync = (chat) => {
     try {
@@ -75,13 +75,12 @@ export function AppSidebar() {
       const lastUserMsg = userMessages.at(-1)?.content ?? null;
       const lastUpdated = chat.lastUpdated ?? Date.now();
       const formattedDate = moment(lastUpdated).fromNow();
-      
 
       return {
         chatId: chat.chatId,
         message: lastUserMsg,
         lastMsgDate: formattedDate,
-        lastMsgTimestamp: lastUpdated, 
+        lastMsgTimestamp: lastUpdated,
       };
     } catch (err) {
       console.error("Message parse error:", err);
@@ -94,12 +93,11 @@ export function AppSidebar() {
     [chatHistory]
   );
 
-
-  const GetRemainingTokenMsgs=async()=>{
-    const result =await axios.post('/api/user-remaining-msg')
-console.log(result)
-setFreeMesgCount(result?.data?.remainingToken)
-  }
+  const GetRemainingTokenMsgs = async () => {
+    const result = await axios.get("/api/user-remaining-msg");
+    console.log(result);
+    setFreeMesgCount(result?.data?.remainingToken);
+  };
 
   return (
     <Sidebar>
@@ -190,11 +188,19 @@ setFreeMesgCount(result?.data?.remainingToken)
             </SignInButton>
           ) : (
             <div>
-              <UsageCreditProgress remainingToken={freeMsgCount}/>
-              <Button className="w-full mb-3">
-                <Zap />
-                Upgrade Plan
-              </Button>
+              {!has({ plan: "unlimited_plan" }) && (
+                <div>
+                  <UsageCreditProgress remainingToken={freeMsgCount} />
+
+                  <PricingModal>
+                    <Button className="w-full mb-3">
+                      <Zap />
+                      Upgrade Plan
+                    </Button>
+                  </PricingModal>
+                </div>
+              )}
+
               <Button className="flex" variant={"ghost"}>
                 <User2 />
                 <h2>Settings</h2>
