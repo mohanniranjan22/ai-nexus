@@ -10,6 +10,8 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/config/FirebaseConfig";
 import { useUser } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
+
 
 function ChatInputBox() {
   const [userInput, setUserInput] = useState("");
@@ -34,6 +36,19 @@ function ChatInputBox() {
   }, [params]);
   const handleSend = async () => {
     if (!userInput.trim()) return;
+
+    //call only if user Free
+    //deduct and check token limit
+    const result = await axios.post("/api/user-remaining-msg", {
+      token: 1,
+    });
+    const remainingToken = result?.data?.remainingToken;
+    if (remainingToken <= 0) {
+      console.log("Limit Exceed");
+      toast.error("Maximum Daily Limit Exceed");
+
+      return;
+    }
 
     // 1️⃣ Add user message to all enabled models
     setMessages((prev) => {

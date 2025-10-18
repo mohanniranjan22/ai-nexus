@@ -12,18 +12,23 @@ import { SignInButton, useUser } from "@clerk/nextjs";
 import { Moon, Sun, User2, Zap } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useContext } from "react";
 import UsageCreditProgress from "./UsageCreditProgress";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/config/FirebaseConfig";
 import moment from "moment/moment";
 import Link from "next/link";
+import axios from "axios";
+import { AiSelectedModelContext } from "@/context/AiSelectedModelContext";
 
 export function AppSidebar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { user } = useUser();
   const [chatHistory, setChatHistory] = useState([]);
+  const [freeMsgCount,setFreeMesgCount]=useState(0)
+  const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
+      useContext(AiSelectedModelContext);
 
   useEffect(() => setMounted(true), []);
 
@@ -43,9 +48,16 @@ export function AppSidebar() {
       const chats = snapshot.docs.map((doc) => doc.data());
       setChatHistory(chats);
     });
+  
 
     return () => unsubscribe();
   }, [user]);
+
+
+  useEffect(()=>{
+    GetRemainingTokenMsgs()
+
+  },[messages])
 
   const GetLastUserMessageFromChatSync = (chat) => {
     try {
@@ -81,6 +93,13 @@ export function AppSidebar() {
     () => chatHistory.map((c) => GetLastUserMessageFromChatSync(c)),
     [chatHistory]
   );
+
+
+  const GetRemainingTokenMsgs=async()=>{
+    const result =await axios.post('/api/user-remaining-msg')
+console.log(result)
+setFreeMesgCount(result?.data?.remainingToken)
+  }
 
   return (
     <Sidebar>
@@ -171,7 +190,7 @@ export function AppSidebar() {
             </SignInButton>
           ) : (
             <div>
-              <UsageCreditProgress />
+              <UsageCreditProgress remainingToken={freeMsgCount}/>
               <Button className="w-full mb-3">
                 <Zap />
                 Upgrade Plan
