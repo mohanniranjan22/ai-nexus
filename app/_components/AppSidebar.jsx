@@ -201,10 +201,16 @@ export function AppSidebar() {
                 </div>
               )}
 
-              <Button className="flex" variant={"ghost"}>
+              {/* <Button className="flex" variant={"ghost"}>
                 <User2 />
                 <h2>Settings</h2>
-              </Button>
+              </Button> */}
+              <Link href="/profile">
+                <Button className="flex w-full" variant={"ghost"}>
+                  <User2 />
+                  <h2>Settings</h2>
+                </Button>
+              </Link>
             </div>
           )}
         </div>
