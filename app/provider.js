@@ -25,13 +25,6 @@ function Provider({ children, ...props }) {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (aiSelectedModels) {
-      //update to Firebase Database
-      updateAIModelSelectionPref();
-    }
-  }, [aiSelectedModels]);
-
   // const updateAIModelSelectionPref = async () => {
   //   const docRef = doc(db, "users", user?.primaryEmailAddress?.emailAddress);
   //   await updateDoc(docRef, {
@@ -49,7 +42,12 @@ function Provider({ children, ...props }) {
       selectedModelPref: aiSelectedModels,
     });
   };
-
+  useEffect(() => {
+    if (aiSelectedModels) {
+      //update to Firebase Database
+      updateAIModelSelectionPref();
+    }
+  }, [aiSelectedModels, updateAIModelSelectionPref]);
   const CreateUser = async () => {
     //if User exist?
     const userRef = doc(db, "users", user?.primaryEmailAddress?.emailAddress);
@@ -57,7 +55,7 @@ function Provider({ children, ...props }) {
     if (userSnap.exists()) {
       console.log("Existing User");
       const userInfo = userSnap.data();
-      setAiSelectedModels(userInfo?.selectedModelPref??DefaultModel);
+      setAiSelectedModels(userInfo?.selectedModelPref ?? DefaultModel);
       setUserDetails(userInfo);
       return;
     } else {
