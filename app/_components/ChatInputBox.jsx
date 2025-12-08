@@ -16,7 +16,7 @@ function ChatInputBox() {
   const [userInput, setUserInput] = useState("");
   const { aiSelectedModels, setAiSelectedModels, messages, setMessages } =
     useContext(AiSelectedModelContext);
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
 
   const [chatId, setChatId] = useState();
 
